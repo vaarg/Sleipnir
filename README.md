@@ -7,8 +7,12 @@ Sleipnir is a simple python messenger program than can be launched either in cli
 ## Usage: 
 To launch as Client:
     
+    Sleipnir.py -t [IP]
+    
     Sleipnir.py -t [IP] -p [PORT]
 
 To launch as Server:
+    
+    Sleipnir.py -t [IP] -s
     
     Sleipnir.py -t [IP] -p [PORT] -s
