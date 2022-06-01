@@ -1,3 +1,7 @@
+#!/bin/python
+
+# Sleipnir v 0.1
+
 import argparse
 import socket
 import threading
