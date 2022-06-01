@@ -10,7 +10,7 @@ def connector():
         print(f"{clientAddress} has connected.")
         clientSocket.send(bytes("Enter in username and then press [ENTER]: ", encoding))
         addresses[clientSocket] = clientAddress
-        threading.Thread(target=handler, args=(clientSocket,)).start()
+        threading.Thread(target=handler, args=(clientSocket,), daemon=True).start()
 
 def handler(clientSocket):
     username = clientSocket.recv(byteSize).decode(encoding)
@@ -19,12 +19,11 @@ def handler(clientSocket):
     clients[clientSocket] = username
     message = f"{username} has connected!"
     broadcaster(bytes(message, encoding))
-    sending = threading.Thread(target=serverSend)
+    sending = threading.Thread(target=serverSend, daemon=True)
     sending.start()
 
     while True:
             message = clientSocket.recv(byteSize)
-            # print(message)
             if message != bytes("q!", encoding):
                 broadcaster(message, username+": ")       
             else:
@@ -35,7 +34,6 @@ def handler(clientSocket):
                 break
 
 def broadcaster(message, prefix=""):
-    # print(message)
     print(f"{prefix}{message.decode(encoding)}")
     for sockets in clients:
         sockets.send(bytes(prefix, encoding) + message)
@@ -44,13 +42,6 @@ def serverSend():
     while True:
         messageSend = input()
         broadcaster(bytes(messageSend, encoding), "Host: ")
-
-def closerFn():
-    # server.shutdown(socket.SHUT_RDWR)
-    # server.close()
-    # exit()
-    sys.exit(0)
-    # os._exit()
 
 def serverInit():
     global clients, addresses, server, newThread
@@ -61,9 +52,10 @@ def serverInit():
     server.bind((HOST, PORT))
     server.listen(5)
     print("Awaiting connections...")
-    newThread = threading.Thread(target=connector)
+    newThread = threading.Thread(target=connector, daemon=True)
     newThread.start()
     newThread.join() 
+    server.close()
 
 # Client:
 
@@ -78,7 +70,7 @@ def clientInit():
     print(f"Connecting to {HOST}:{PORT}.")
     clientSock.connect((HOST,PORT))
 
-    clientThread = threading.Thread(target=receiver)
+    clientThread = threading.Thread(target=receiver, daemon=True)
     clientThread.daemon = True
     clientThread.start()
 
@@ -89,13 +81,12 @@ def clientInit():
             break
         clientSock.send(bytes(messageSend, encoding))
     print(f"Terminating sequence '{terminatingStr}' entered! Terminating client.")
-    clientSock.close
-    sys.exit()   
+    clientSock.close()
 
 # [!] Main
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-t','-T','--target', help="target IP")
+parser.add_argument('-t','-T','--target', required=True, help="target IP")
 parser.add_argument('-p','-P','--port', help="target PORT", type=int, default=4444)
 parser.add_argument('-s','-S','--server', action='store_true', help="launch as Server")
 args = parser.parse_args()
