@@ -1,5 +1,5 @@
 ## Sleipnir
-Sleipnir is a simple python messenger program than can be launched either in client mode or in server mode.
+Sleipnir is a simple python messenger program than can be launched either in client or server mode.
 
 ## Features to be added:
 - Messenger Encryption
