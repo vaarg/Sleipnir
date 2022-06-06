@@ -19,4 +19,5 @@ To launch as Server:
 
 ## Dependencies:
 
-    Python Crytodome library - "pip install pycryptodomex"
+    Python Crytodome library: 
+    pip install pycryptodomex
