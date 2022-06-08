@@ -27,3 +27,9 @@ To launch as Server:
 Python Crytodome library: 
     
     pip install pycryptodomex
+
+## Why is this program named "Sleipnir"?
+
+In Germanic mythology Sleipnir is the steed of Odin and a child of Loki. In addition to his other attributes, Odin is a god of knowledge and secrets. He is the god who gave runes (written language) to mankind and yet he is also a psychopomp; one who leads the dead to the afterlife, while riding Sleipnir - whether to Hel or Valholl.
+
+Naming this program Sleipnir felt right. The program itself is 'secretive' in its use of encryption (and Sleipnir's links to Loki and secretism work well too) and sometimes the non-sense of staring at hashes too long feels like looking at runes. Communication is information, and information is knowledge which I felt suited the Odinic theme well. I also feel like the name Sleipnir worked with the chthonic theme of 'underground' (encrypted/private) communication.
