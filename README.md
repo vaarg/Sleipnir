@@ -1,11 +1,16 @@
 ## Sleipnir
-Sleipnir is a simple python messenger program than can be launched either in client or server mode.
+Sleipnir is a simple Python messenger with encryption.
 
-## Features to be added:
-- Messenger Encryption
+Sleipnir can be launched either in server mode (with "-s" flag) or in client mode.
+Users who launch as server can still message other users as though they are a client.
+
+When Sleipnir is launched as a server, the host chooses the password that will allow clients to connect.
+Obviously, passwords are not sent in plaintext and instead the client/server pass hashes are compared to determine a match.
+Matchings passwords renders messages as mutually legible via en/decryption.
+
 
 ## Usage: 
-To launch as Client:
+To launch as Client ("q!" to quit):
     
     Sleipnir.py -t [IP]
     
