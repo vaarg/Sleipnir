@@ -5,8 +5,7 @@ Sleipnir can be launched either in server mode (with "-s" flag) or in client mod
 Users who launch as server can still message other users as though they are a client.
 
 When Sleipnir is launched as a server, the host chooses the password that will allow clients to connect.
-Obviously, passwords are not sent in plaintext and instead the client/server pass hashes are compared to determine a match.
-Matchings passwords renders messages as mutually legible via en/decryption.
+Obviously, passwords are not sent in plaintext and instead the server attempts to decrypt the client pass hash on the assumption that both server and client have the same password. If decryption is successful then the client connects, otherwise the client is disconnected. Furthermore, matchings passwords render messages as mutually legible via en/decryption.
 
 
 ## Usage: 
