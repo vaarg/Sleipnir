@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 0.3.2
+# Sleipnir v 0.3.3
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -51,7 +51,12 @@ def handler(clientSocket, clientAddress):
     username = clientSocket.recv(byteSize).decode(encoding)
     clientSocket.send(bytes("Authenticating...", encoding))
     clients[clientSocket] = username
-    cliPass = clientSocket.recv(byteSize)    
+    cliPass = clientSocket.recv(byteSize)
+    try:
+        decryptMsg(cliPass)
+        cliPass = decrypted_data 
+    except:
+        cliPass = ""  
     sending = threading.Thread(target=serverSend, daemon=True)
     sending.start()
     mode = 0
@@ -140,9 +145,10 @@ def clientInit():
 
     passwordSess = bytes(input("Enter session password and then press [ENTER]: "), encoding)
     passwordSet(passwordSess)
+    encryptMsg(password)
     username = input("Enter username and the press [ENTER]: ")
     clientSock.send(bytes(username, encoding))
-    clientSock.send(password)
+    clientSock.send(ciphered_data)
 
     clientThread = threading.Thread(target=receiver, daemon=True)
     clientThread.daemon = True
