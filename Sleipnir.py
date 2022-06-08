@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 1.0
+# Sleipnir v 1.0.1
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -61,12 +61,12 @@ def handler(clientSocket, clientAddress):
         cliPass = ""  
     sending = threading.Thread(target=serverSend, daemon=True)
     sending.start()
-    part = 0
+    stage = 0
 
     while True:
-        if part == 0:
+        if stage == 0:
             if cliPass == password:
-                part = 1 
+                stage = 1 
                 pass       
             else:
                 kill = f"{terminatingStr}"
@@ -75,15 +75,15 @@ def handler(clientSocket, clientAddress):
                 del clients[clientSocket]
                 broadcaster(bytes(f"{clientAddress} has been disconnected: Incorrect session password.", encoding))
                 break
-        if part == 1:
-            part = 2
+        if stage == 1:
+            stage = 2
             success = f"You have successfully connected as {username}! Type '{terminatingStr}' to terminate connection at anypoint."
             time.sleep(1)
             clientSocket.send(bytes(success, encoding))
             message = f"{username} has connected!"
             broadcaster(message.encode(encoding))
             pass
-        if part == 2:
+        if stage == 2:
             message = clientSocket.recv(byteSize)
             decryptMsg(message)
             if decrypted_data.decode(encoding) != "q!":
@@ -118,7 +118,7 @@ def serverInit():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((HOST, PORT))
-    server.listen(5)
+    server.listen(maxClients)
     print("Awaiting connections...")
     newThread = threading.Thread(target=connector, daemon=True)
     newThread.start()
@@ -183,6 +183,7 @@ args = parser.parse_args()
 HOST = args.target
 PORT = args.port
 
+maxClients = 10
 byteSize = 2048
 encoding = "latin-1"
 terminatingStr = "q!"
