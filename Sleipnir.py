@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 0.3
+# Sleipnir v 0.3.2
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -44,16 +44,13 @@ def connector():
     while True:
         clientSocket, clientAddress = server.accept()
         print(f"{clientAddress} has connected.")
-        clientSocket.send(bytes("Enter in username and then press [ENTER]: ", encoding))
         addresses[clientSocket] = clientAddress
         threading.Thread(target=handler, args=(clientSocket,clientAddress), daemon=True).start()
 
 def handler(clientSocket, clientAddress):
     username = clientSocket.recv(byteSize).decode(encoding)
-    success = f"You have connected as {username}, type '{terminatingStr}' to terminate connection at anypoint."
-    clientSocket.send(bytes(success, encoding))
+    clientSocket.send(bytes("Authenticating...", encoding))
     clients[clientSocket] = username
-    clientSocket.send(bytes("\nEnter session password and the press [ENTER]: ", encoding))
     cliPass = clientSocket.recv(byteSize)    
     sending = threading.Thread(target=serverSend, daemon=True)
     sending.start()
@@ -73,6 +70,8 @@ def handler(clientSocket, clientAddress):
                 break
         if mode == 1:
             mode = 2
+            success = f"You have successfully connected as {username}! Type '{terminatingStr}' to terminate connection at anypoint."
+            clientSocket.send(bytes(success, encoding))
             message = f"{username} has connected!"
             broadcaster(bytes(message, encoding))
             pass
@@ -100,6 +99,8 @@ def serverInit():
     global clients, addresses, server, newThread
     clients = {}
     addresses = {}
+    passwordSess = bytes(input("Enter server session password: "), encoding)
+    passwordSet(passwordSess)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((HOST, PORT))
@@ -119,7 +120,7 @@ def receiver():
             break
         else:
             print(messageRecv)  
-    print(f"Incorrect session password entered! Type '{terminatingStr}' to terminate program.")
+    print(f"Disconnected. Incorrect session password! Type '{terminatingStr}' to terminate program.")
 
 def sender():
     while True:
@@ -136,6 +137,12 @@ def clientInit():
     clientSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print(f"Connecting to {HOST}:{PORT}.")
     clientSock.connect((HOST,PORT))
+
+    passwordSess = bytes(input("Enter session password and then press [ENTER]: "), encoding)
+    passwordSet(passwordSess)
+    username = input("Enter username and the press [ENTER]: ")
+    clientSock.send(bytes(username, encoding))
+    clientSock.send(password)
 
     clientThread = threading.Thread(target=receiver, daemon=True)
     clientThread.daemon = True
@@ -159,9 +166,6 @@ terminatingStr = "q!"
 iv = 16 * b'\0'
 
 if args.server:
-    passwordSess = bytes(input("Enter server session password: "), 'utf-8')
-    passwordSet(passwordSess)
     serverInit()
 else:
     clientInit()
-
