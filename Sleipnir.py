@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 0.3.3
+# Sleipnir v 1.0
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -9,6 +9,7 @@ import argparse
 import base64
 import socket
 import threading
+import time
 
 # [=] Common:
 
@@ -50,6 +51,7 @@ def connector():
 def handler(clientSocket, clientAddress):
     username = clientSocket.recv(byteSize).decode(encoding)
     clientSocket.send(bytes("Authenticating...", encoding))
+    time.sleep(1)
     clients[clientSocket] = username
     cliPass = clientSocket.recv(byteSize)
     try:
@@ -59,12 +61,12 @@ def handler(clientSocket, clientAddress):
         cliPass = ""  
     sending = threading.Thread(target=serverSend, daemon=True)
     sending.start()
-    mode = 0
+    part = 0
 
     while True:
-        if mode == 0:
+        if part == 0:
             if cliPass == password:
-                mode = 1 
+                part = 1 
                 pass       
             else:
                 kill = f"{terminatingStr}"
@@ -73,27 +75,34 @@ def handler(clientSocket, clientAddress):
                 del clients[clientSocket]
                 broadcaster(bytes(f"{clientAddress} has been disconnected: Incorrect session password.", encoding))
                 break
-        if mode == 1:
-            mode = 2
+        if part == 1:
+            part = 2
             success = f"You have successfully connected as {username}! Type '{terminatingStr}' to terminate connection at anypoint."
+            time.sleep(1)
             clientSocket.send(bytes(success, encoding))
             message = f"{username} has connected!"
-            broadcaster(bytes(message, encoding))
+            broadcaster(message.encode(encoding))
             pass
-        if mode == 2:
+        if part == 2:
             message = clientSocket.recv(byteSize)
-            if message != bytes("q!", encoding):
-                broadcaster(message, username+": ")       
+            decryptMsg(message)
+            if decrypted_data.decode(encoding) != "q!":
+                broadcaster(decrypted_data, username+": ")
             else:
                 clientSocket.close()
                 del clients[clientSocket]
-                broadcaster(bytes(f"{username} has disconnected.", encoding))
+                disconnect = f"{username} has disconnected."
+                broadcaster(disconnect.encode(encoding))
                 break
+
 
 def broadcaster(message, prefix=""):
     print(f"{prefix}{message.decode(encoding)}")
+    sendMessage = prefix.encode(encoding) + message
+    encryptMsg(sendMessage)
     for sockets in clients:
-        sockets.send(bytes(prefix, encoding) + message)
+        sockets.send(ciphered_data)
+
 
 def serverSend():
     while True:
@@ -119,21 +128,29 @@ def serverInit():
 # [>] Client:
 
 def receiver():
+    count = 0
     while True:
-        messageRecv = clientSock.recv(byteSize).decode(encoding)
-        if messageRecv == f"{terminatingStr}":
-            break
+        messageRecv = clientSock.recv(byteSize)
+        count += 1
+        if count < 3:
+            messageRecv = messageRecv.decode(encoding)
+            if messageRecv == f"{terminatingStr}":
+                break
+            print(messageRecv)
         else:
-            print(messageRecv)  
+            decryptMsg(messageRecv)
+            print(decrypted_data.decode(encoding))
     print(f"Disconnected. Incorrect session password! Type '{terminatingStr}' to terminate program.")
 
 def sender():
     while True:
         messageSend = input()
         if messageSend == terminatingStr:
-            clientSock.send(bytes(terminatingStr, encoding))
+            encryptMsg(messageSend.encode(encoding))
+            clientSock.send(ciphered_data)
             break
-        clientSock.send(bytes(messageSend, encoding))
+        encryptMsg(messageSend.encode(encoding))
+        clientSock.send(ciphered_data)
     print(f"Termination sequence '{terminatingStr}' entered! Terminating client.")
     clientSock.close()
 
