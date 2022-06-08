@@ -24,5 +24,6 @@ To launch as Server:
     Sleipnir.py -t [IP] -p [PORT] -s
 
 ## Dependencies:
-
-    Python Crytodome library ["pip install pycryptodomex"]
+Python Crytodome library: 
+    
+    pip install pycryptodomex
