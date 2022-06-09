@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 1.0.1
+# Sleipnir v 1.0.2
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -86,7 +86,7 @@ def handler(clientSocket, clientAddress):
         if stage == 2:
             message = clientSocket.recv(byteSize)
             decryptMsg(message)
-            if decrypted_data.decode(encoding) != "q!":
+            if decrypted_data.decode(encoding) != f"{terminatingStr}":
                 broadcaster(decrypted_data, username+": ")
             else:
                 clientSocket.close()
