@@ -1,6 +1,6 @@
 #!/bin/python
 
-# Sleipnir v 1.0.2
+# Sleipnir v 1.0.3
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
@@ -18,7 +18,7 @@ def passwordSet(passwordSess):
     password = passwordSess
 
     if len(password) < 16:
-        i = len(password) # 15
+        i = len(password)
         while i < 16:
             password += b'A'
             i += 1
@@ -40,6 +40,13 @@ def decryptMsg(ciphered_data):
     decrypted_data = unpad(cipher.decrypt(ciphered_data), AES.block_size)
 
 # [<] Server:
+
+def broadcaster(message, prefix=""):
+    print(f"{prefix}{message.decode(encoding)}")
+    sendMessage = prefix.encode(encoding) + message
+    encryptMsg(sendMessage)
+    for sockets in clients:
+        sockets.send(ciphered_data)
 
 def connector():
     while True:
@@ -94,15 +101,6 @@ def handler(clientSocket, clientAddress):
                 disconnect = f"{username} has disconnected."
                 broadcaster(disconnect.encode(encoding))
                 break
-
-
-def broadcaster(message, prefix=""):
-    print(f"{prefix}{message.decode(encoding)}")
-    sendMessage = prefix.encode(encoding) + message
-    encryptMsg(sendMessage)
-    for sockets in clients:
-        sockets.send(ciphered_data)
-
 
 def serverSend():
     while True:
