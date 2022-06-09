@@ -1,6 +1,18 @@
 #!/bin/python
 
-# Sleipnir v 1.0.3
+# Sleipnir v 1.0.4
+
+# Usage:
+    # As server:
+        # Sleipnir.py -t [IP] -s
+        # Sleipnir.py -t [IP] -p [PORT] -s
+    # As client:
+        # Sleipnir.py -t [IP]
+        # Sleipnir.py -t [IP] -p [PORT]
+# Decription:
+    # An encrypted Python messenger with multi-threading. Sleipnir can be launched as either server or client.
+# Dependencies:
+    # Python Cryptodome library - "pip install pycryptodomex"
 
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
