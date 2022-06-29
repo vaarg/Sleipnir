@@ -1,6 +1,7 @@
 #!/bin/python
 
-# Sleipnir v 1.0.4
+# Sleipnir v 1.0.5
+# Author: https://github.com/vaarg/
 
 # Usage:
     # As server:
